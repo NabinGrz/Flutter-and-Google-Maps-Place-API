@@ -63,6 +63,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        useMaterial3: true,
         textTheme: GoogleFonts.poppinsTextTheme(),
         // fontFamily: ,
         // This is the theme of your application.

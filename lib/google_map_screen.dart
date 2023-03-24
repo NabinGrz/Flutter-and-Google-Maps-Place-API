@@ -19,11 +19,12 @@ class GoogleMapScreen extends StatefulWidget {
 }
 
 class _GoogleMapScreenState extends State<GoogleMapScreen> {
-  late final BitmapDescriptor currentLocation;
+  BitmapDescriptor? currentLocation;
   TextEditingController placeController = TextEditingController();
 
   late final GoogleMapController _controller;
   Position? _currentPosition;
+  LatLng _currentLatLng = const LatLng(27.671332124757402, 85.3125417636781);
 
   @override
   void initState() {
@@ -33,17 +34,13 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
   getLocation() async {
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
-
+    var pp = await Geolocator.checkPermission();
+    // if (pp.name == LocationPermission.always) {
     _currentPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+    _currentLatLng =
+        LatLng(_currentPosition!.latitude, _currentPosition!.longitude);
     setState(() {});
-    BitmapDescriptor.fromAssetImage(
-            const ImageConfiguration(size: Size(48, 48)),
-            'assets/images/currentLocation.png')
-        .then((onValue) {
-      currentLocation = onValue;
-    });
-    // });
   }
 
   Widget autoComplete() {
@@ -68,10 +65,11 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
           });
         },
         getImmediateSuggestions: true,
-        keepSuggestionsOnLoading: false,
+        keepSuggestionsOnLoading: true,
         textFieldConfiguration: TextFieldConfiguration(
+            style: GoogleFonts.lato(),
             controller: placeController,
-            style: GoogleFonts.poppins(),
+            // style: GoogleFonts.poppins(),
             decoration: InputDecoration(
               isDense: false,
               fillColor: Colors.transparent,
@@ -88,6 +86,7 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
               //     const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
               hintText: "Where are you going?",
               hintStyle: GoogleFonts.lato(),
+
               border: InputBorder.none,
               focusedBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
@@ -121,18 +120,19 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
           );
         },
         noItemsFoundBuilder: (context) {
-          return Wrap(
-            children: const [
-              Center(
-                  heightFactor: 2,
-                  child: Text(
-                    "Location Not Found!!",
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
-                  )),
-            ],
-          );
+          return Container();
+          // return Wrap(
+          //   children: const [
+          //     Center(
+          //         heightFactor: 2,
+          //         child: Text(
+          //           "Location Not Found!!",
+          //           style: TextStyle(
+          //             fontSize: 12,
+          //           ),
+          //         )),
+          //   ],
+          // );
         },
         suggestionsCallback: (String pattern) async {
           var predictionModel =
@@ -260,56 +260,56 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
       extendBodyBehindAppBar: true,
       extendBody: true,
       resizeToAvoidBottomInset: false,
-      body: _currentPosition == null
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Stack(
-              children: [
-                GoogleMap(
-                  myLocationButtonEnabled: false,
-                  myLocationEnabled: true,
-                  zoomControlsEnabled: false,
-                  initialCameraPosition: CameraPosition(
-                      zoom: 16,
-                      target: LatLng(_currentPosition!.latitude,
-                          _currentPosition!.longitude)),
-                  onMapCreated: (controller) async {
-                    setState(() {
-                      _controller = controller;
-                    });
-                    String val = "json/google_map_dark_theme.json";
-                    var c = await rootBundle.loadString(val);
-                    _controller.setMapStyle(c);
-                  },
-                  markers: {
-                    Marker(
-                        markerId: const MarkerId("1"),
-                        icon: currentLocation,
-                        position: LatLng(_currentPosition!.latitude,
-                            _currentPosition!.longitude))
-                  },
-                ),
-                Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20, top: 70),
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        autoComplete(),
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        locationsWidget(),
-                        const Spacer(),
-                        confirmButton(),
-                      ],
-                    ),
-                  ),
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark,
+        child: _currentPosition == null
+            ? const Center(child: CircularProgressIndicator()
+                //CircularProgressIndicator(),
                 )
-              ],
-            ),
+            : Stack(
+                children: [
+                  GoogleMap(
+                    myLocationButtonEnabled: false,
+                    myLocationEnabled: true,
+                    zoomControlsEnabled: false,
+                    initialCameraPosition:
+                        CameraPosition(zoom: 16, target: _currentLatLng),
+                    onMapCreated: (controller) async {
+                      setState(() {
+                        _controller = controller;
+                      });
+                      String val = "json/google_map_dark_light.json";
+                      var c = await rootBundle.loadString(val);
+                      _controller.setMapStyle(c);
+                    },
+                    markers: {
+                      Marker(
+                          markerId: const MarkerId("1"),
+                          // icon: currentLocation!,
+                          position: _currentLatLng)
+                    },
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 20, right: 20, top: 40),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          autoComplete(),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          locationsWidget(),
+                          const Spacer(),
+                          confirmButton(),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+      ),
     );
   }
 
@@ -324,7 +324,10 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         },
         child: Text(
           "CONFIRM",
-          style: GoogleFonts.lato(fontSize: 18),
+          style: GoogleFonts.lato(
+            fontSize: 18,
+            color: Colors.white,
+          ),
         ));
   }
 }

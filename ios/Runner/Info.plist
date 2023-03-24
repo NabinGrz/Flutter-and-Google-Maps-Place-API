@@ -22,6 +22,12 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Cronlink uses location data for tracking of drivers.\nYour data will not be shared with any other.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Cronlink uses location data for tracking of drivers.\nYour data will not be shared with any other.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Cronlink uses location data for tracking of drivers.\nYour data will not be shared with any other.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
