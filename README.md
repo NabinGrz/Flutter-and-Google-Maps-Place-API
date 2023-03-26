@@ -10,7 +10,7 @@ Please note that permissions are not handled in this project.
 - [http](https://pub.dev/packages/http)
 
 ## Usage
-Note that you will need to obtain a Google Maps API key and enable the Google Maps Places API for your project.
+Note that you will need to obtain a Google Maps API key and enable the Google Maps Places API to use this project.
 Once you have your API key, add your key in lib/constants/string_constants.dart.
 
 
